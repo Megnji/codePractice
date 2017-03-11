@@ -63,11 +63,7 @@ public class BTree implements Cloneable {
 	    if (data[i] == element){
 	    	return; // since there's already a copy in the set
 	    }else if (childCount == 0){ // Add the new element to the root at data[i]. (shift array)
-	    	dataCount ++;
-	    	for (int j = dataCount - 1;  j > i; j--){
-	    		data[j] = data[j-1];
-	    	}
-	    	data[i] = element;
+	    	addElement(element,i);
 	    }else{
 	    	subset[i].looseAdd(element);
 	    	if (subset[i].dataCount > MAXIMUM){  // if the root of subset[i] now has an excess element, then fix that problem before returning.
@@ -80,9 +76,43 @@ public class BTree implements Cloneable {
 	// postcondition: the tree is rearranged to satisfy the loose addition rule
 	private void fixExcess(int i){
 		if (i < childCount && dataCount <= MAXIMUM && subset[i].dataCount == MAXIMUM +1){
-			
+			int j = subset[i].dataCount / 2;
+			int element = subset[i].data[j];
+			addElement(element,i);
+			subset[i].removeElement(element, i);
 		}
 	}
 
+	private void addElement(int element,int i){
+    	dataCount ++;
+    	for (int j = dataCount - 1;  j > i; j--){
+    		data[j] = data[j-1];
+    	}
+    	data[i] = element;
+	}
+	
+	private void addChild(BTree child,int i){
+		childCount ++;
+		for (int j = childCount -1; j>i; j--){
+			subset[j] = subset[j-1];
+		}
+		subset[i] = child;
+	}
+	
+	private void removeElement(int element,int i){
+		for (int j = i; j< dataCount-1; j++){
+			data[j] = data[j+1];
+		}
+		data[dataCount -1] = 0;
+		dataCount --;
+	}
+	
+	private void removeChild(BTree child,int i){
+		for (int j = i ; j< childCount -1 ; j++){
+			subset[j] = subset[j+1];
+		}
+		subset[childCount -1 ] = null;
+		childCount --;
+	}
 
 }
